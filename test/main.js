@@ -33,7 +33,7 @@ describe('node-lambda', function() {
   });
 
   it('version should be set', function() {
-    assert.equal(lambda.version, '0.4.0');
+    assert.equal(lambda.version, '0.3.15');
   });
 
   describe('_params', function() {
@@ -84,7 +84,7 @@ describe('node-lambda', function() {
     });
 
     it('_npm adds node_modules', function(done) {
-      this.timeout(60000); // give it time to build the node modules
+      this.timeout(10000); // give it time to build the node modules
 
       lambda._npmInstall(program, codeDirectory, function(err, result) {
         var contents = fs.readdirSync(codeDirectory);
