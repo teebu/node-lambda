@@ -39,21 +39,21 @@ describe('node-lambda', function () {
   });
 
   describe('_params', function () {
-    it('appends environment to original functionName', function () {
-      var params = lambda._params(program);
-      assert.equal(params.FunctionName, 'node-lambda-development');
-    });
-
-    it('appends environment to original functionName (production)', function () {
-      program.environment = 'production';
-      var params = lambda._params(program);
-      assert.equal(params.FunctionName, 'node-lambda-production');
-    });
-
+    // it('appends environment to original functionName', function () {
+    //   var params = lambda._params(program);
+    //   assert.equal(params.FunctionName, 'node-lambda-development');
+    // });
+    //
+    // it('appends environment to original functionName (production)', function () {
+    //   program.environment = 'production';
+    //   var params = lambda._params(program);
+    //   assert.equal(params.FunctionName, 'node-lambda-production');
+    // });
+    //
     it('appends version to original functionName', function () {
       program.version = '2015-02-01';
       var params = lambda._params(program);
-      assert.equal(params.FunctionName, 'node-lambda-development-2015-02-01');
+      assert.equal(params.FunctionName, 'node-lambda-2015-02-01');
     });
 
     it('appends VpcConfig to params when vpc params set', function() {
