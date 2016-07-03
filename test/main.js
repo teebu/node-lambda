@@ -101,7 +101,7 @@ describe('node-lambda', function () {
 
     describe("when there are excluded files", function (done) {
       beforeEach(function (done) {
-        program.excludeGlobs="*.png test"
+        program.excludeGlobs="^(.*?)\.png$ test"; // matches: *.png *test*
         done();
       });
 
