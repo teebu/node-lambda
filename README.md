@@ -4,6 +4,10 @@
 
 Command line tool to locally run and deploy your node.js application to [Amazon Lambda](http://aws.amazon.com/lambda/).
 
+Windows build:
+[![BuildStatus](https://travis-ci.org/teebu/node-lambda.png?branch=windows-0.8)](https://travis-ci.org/teebu/node-lambda)
+
+Original:
 [![BuildStatus](https://travis-ci.org/motdotla/node-lambda.png?branch=master)](https://travis-ci.org/motdotla/node-lambda)
 [![NPM version](https://badge.fury.io/js/node-lambda.png)](http://badge.fury.io/js/node-lambda)
 
@@ -16,6 +20,10 @@ node-lambda run
 ```
 npm install -g node-lambda
 ```
+
+## Windows requirements:
+
+install [7zip](http://www.7-zip.org/download.html), and make sure 7z is in your path.
 
 ## Example App
 
