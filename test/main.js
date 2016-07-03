@@ -3,7 +3,6 @@ var program = require('commander');
 var fs = require('fs');
 var Hoek = require('hoek');
 var lambda = require('../lib/main');
-var fs = require('fs');
 var _ = require('lodash');
 var zip = require('node-zip');
 var rimraf = require('rimraf');
@@ -225,8 +224,8 @@ describe('node-lambda', function () {
 
       fs.mkdirSync(path);
       fs.mkdirSync(path + '/d');
-      fs.writeFileSync(path + '/testa', 'a');
-      fs.writeFileSync(path + '/d/testb', 'b');
+      fs.writeFileSync(path + '/prebuilda', 'a');
+      fs.writeFileSync(path + '/d/prebuildb', 'b');
 
       program.prebuiltDirectory = path;
       lambda._archive(program, function (err, data) {
@@ -234,9 +233,9 @@ describe('node-lambda', function () {
         var contents = _.map(archive.files, function (f) {
           return f.name.toString();
         });
-        var result = _.includes(contents, 'testa');
+        var result = _.includes(contents, 'prebuilda');
         assert.equal(result, true);
-        result = _.includes(contents, 'd/testb');
+        result = _.includes(contents, 'd/prebuildb');
         assert.equal(result, true);
         done();
 
