@@ -194,16 +194,18 @@ describe('lib/main', function () {
 
   describe('_isUseS3', () => {
     it('=== true', () => {
-      assert.isTrue(lambda._isUseS3({deployUseS3: true}))
-      assert.isTrue(lambda._isUseS3({deployUseS3: 'true'}))
+      assert.isTrue(lambda._isUseS3({
+        deployS3Bucket: 'bucket',
+        deployS3Key: 'key'
+      }))
     })
 
     it('=== false', () => {
       [
         {},
-        {deployUseS3: false},
-        {deployUseS3: 'false'},
-        {deployUseS3: 'foo'}
+        {deployS3Bucket: '', deployS3Key: ''},
+        {deployS3Bucket: 'bucket'},
+        {deployS3Key: 'key'}
       ].forEach((params) => {
         assert.isFalse(lambda._isUseS3(params), params)
       })
@@ -308,12 +310,15 @@ describe('lib/main', function () {
       })
 
       it('Use S3 deploy', () => {
-        const params = lambda._params(Object.assign({deployUseS3: true}, program), 'Buffer')
+        const params = lambda._params(Object.assign({
+          deployS3Bucket: 'S3Bucket-value',
+          deployS3Key: 'S3Key-value'
+        }, program), 'Buffer')
         assert.deepEqual(
           params.Code,
           {
-            S3Bucket: null,
-            S3Key: null
+            S3Bucket: 'S3Bucket-value',
+            S3Key: 'S3Key-value'
           }
         )
       })
@@ -1237,6 +1242,20 @@ describe('lib/main', function () {
           fs.readFileSync(boilerplateFile).toString(),
           targetFile
         )
+      })
+    })
+  })
+
+  describe('Lambda.prototype._s3PutObject()', () => {
+    it('simple test with mock', () => {
+      disableLog()
+      const params = {
+        deployS3Bucket: 'test',
+        deployS3Key: 'test'
+      }
+      return lambda._s3PutObject(params, 'us-east-1', 'buffer').then((result) => {
+        enableLog()
+        assert.deepEqual(result, {'test': 'putObject'})
       })
     })
   })
