@@ -20,7 +20,7 @@ const mockResponse = {
       Resource: 'arn:aws:lambda:node-lambda-test-function',
       Effect: 'Allow',
       Principal: { Service: 's3.amazonaws.com' },
-      Action: [ 'lambda:InvokeFunction' ],
+      Action: ['lambda:InvokeFunction'],
       Condition: { ArnLike: { 'AWS:SourceArn': 'arn:aws:s3:::node-lambda-test-bucket' } }
     })
   },
@@ -63,7 +63,7 @@ describe('lib/s3_events', () => {
         params: params,
         expected: 'node-lambda-test-bucket'
       }, {
-        params: {Bucket: 'example.com'},
+        params: { Bucket: 'example.com' },
         expected: 'example_com'
       }].forEach((test) => {
         const actual = s3Events._statementId(test.params)

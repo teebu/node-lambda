@@ -309,3 +309,97 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Bugfixes
 - remove env var value from commanderjs flag definition [#409](https://github.com/motdotla/node-lambda/pull/409)
+
+## [0.12.0] - 2018-08-10
+### Features
+- Implemente to specify bucket name of S3 [#458](https://github.com/motdotla/node-lambda/pull/458)
+- Implement deployment using S3 (Create a bucket for each region.) [#455](https://github.com/motdotla/node-lambda/pull/455)
+- Add class for uploading deploy package to S3 [#454](https://github.com/motdotla/node-lambda/pull/454)
+- Fix to throw an error except ResourceNotFoundException [#452](https://github.com/motdotla/node-lambda/pull/452)
+- Feature upload to s3 and deploy from bucket [#446](https://github.com/motdotla/node-lambda/pull/446)
+- npm update [#445](https://github.com/motdotla/node-lambda/pull/445)
+- Upgrade dependent packages [#441](https://github.com/motdotla/node-lambda/pull/441)
+- Add simple test of `_deployToRegion()` and `deploy()` [#439](https://github.com/motdotla/node-lambda/pull/439)
+- Remove unnecessary package load in `test/main.js` [#438](https://github.com/motdotla/node-lambda/pull/438)
+- Add cache of `node modules` to CI setting [#436](https://github.com/motdotla/node-lambda/pull/436)
+- Modify `require` to `{ }` statement [#435](https://github.com/motdotla/node-lambda/pull/435)
+- Fix to use `includes` instead of `indexOf` [#433](https://github.com/motdotla/node-lambda/pull/433)
+- Remove test code for Node.js4 [#432](https://github.com/motdotla/node-lambda/pull/432)
+- Upgrade `fs-extra` [#431](https://github.com/motdotla/node-lambda/pull/431)
+- Stop supporting Node.js 4 [#430](https://github.com/motdotla/node-lambda/pull/430)
+- Fix using `klaw` instead of `fs.walk` [#424](https://github.com/motdotla/node-lambda/pull/424)
+- Add Node.js10 to CI setting [#428](https://github.com/motdotla/node-lambda/pull/428)
+
+### Bugfixes
+- Fix StatementId [#451](https://github.com/motdotla/node-lambda/pull/451)
+- Bugfix of initialValue of recude in s3events [#447](https://github.com/motdotla/node-lambda/pull/447)
+- Added handling to catch and log error return from async lambda [#443](https://github.com/motdotla/node-lambda/pull/443)
+- Log result of an async handler method by resolving promise if a promise [#440](https://github.com/motdotla/node-lambda/pull/440)
+- Fix to display return value of handler [#427](https://github.com/motdotla/node-lambda/pull/427)
+- Fix to set array when same bucket [#423](https://github.com/motdotla/node-lambda/pull/423)
+
+## [0.13.0] - 2018-11-15
+### Features
+- Drop nodejs4.3 [#469](https://github.com/motdotla/node-lambda/pull/469)
+- Update maximum timeout value from 300 to 900 [#465](https://github.com/motdotla/node-lambda/pull/465)
+- Modify to follow the rules of the new 'standard' [#463](https://github.com/motdotla/node-lambda/pull/463)
+- Add 'osx' to CI os [#464](https://github.com/motdotla/node-lambda/pull/464)
+- Update CI test to LTS version [#462](https://github.com/motdotla/node-lambda/pull/462)
+- Upgrade `archiver` [#460](https://github.com/motdotla/node-lambda/pull/460)
+
+### Bugfixes
+- Fix value of StartingPosition [#467](https://github.com/motdotla/node-lambda/pull/467)
+
+## [0.14.0] - 2019-05-25
+### Features
+- Support Node.js 10.x [#487](https://github.com/motdotla/node-lambda/pull/487)
+- Add Node.js 12 to CI setting [#486](https://github.com/motdotla/node-lambda/pull/486)
+- Add file to configure aws authentication settings [#482](https://github.com/motdotla/node-lambda/pull/482)
+- Add layers option to readme [#481](https://github.com/motdotla/node-lambda/pull/481)
+- Add option to specify Lambda Layers [#480](https://github.com/motdotla/node-lambda/pull/480)
+- Upgrade packages [#479](https://github.com/motdotla/node-lambda/pull/479)
+- Add dockerVolumes option in package in order to mount additional volumes [#473](https://github.com/motdotla/node-lambda/pull/473)
+- Add keepNodeModules option in package [#472](https://github.com/motdotla/node-lambda/pull/472)
+
+### Bugfixes
+- Remove 'packageDirectory' option from 'deploy' [#484](https://github.com/motdotla/node-lambda/pull/484)
+- Update s3deploy bucket handling [#475](https://github.com/motdotla/node-lambda/pull/475)
+- Fix Docker volume mount from OSX - #461 [#471](https://github.com/motdotla/node-lambda/pull/471)
+
+## [0.15.0] - 2019-12-11
+### Features
+- adds tagging on new and updated functions [#508](https://github.com/motdotla/node-lambda/pull/508)
+- Add nodejs12.x to runtime [#510](https://github.com/motdotla/node-lambda/pull/510)
+- Don't audit packages when installing [#505](https://github.com/motdotla/node-lambda/pull/505)
+- Use `ci` instead of `install` when installing packages [#502](https://github.com/motdotla/node-lambda/pull/502)
+- Add reference to TypeScript example/template [#497](https://github.com/motdotla/node-lambda/pull/497)
+- Drop nodejs6.10 [#495](https://github.com/motdotla/node-lambda/pull/495)
+- Warn on providing unknown commands [#494](https://github.com/motdotla/node-lambda/pull/494)
+- Fix tests
+    - Fix GitHub Actions workflow [#506](https://github.com/motdotla/node-lambda/pull/506)
+    - Fix `npm ci` test. [#509](https://github.com/motdotla/node-lambda/pull/509)
+    - Remove appveyor.yml [#504](https://github.com/motdotla/node-lambda/pull/504)
+    - Modify unit tests [#501](https://github.com/motdotla/node-lambda/pull/501)
+    - Fix GitHub Actions workflow [#500](https://github.com/motdotla/node-lambda/pull/500)
+    - Add GitHub Actions workflow [#499](https://github.com/motdotla/node-lambda/pull/499)
+
+## [0.16.0] - 2020-02-12
+### Features
+- Remove osx from travis [#513](https://github.com/motdotla/node-lambda/pull/513)
+- Drop nodejs8.10 from runtime [#516](https://github.com/motdotla/node-lambda/pull/516)
+
+## [0.17.0] - 2020-05-14
+### Features
+- Implement a simple API Gateway event [#530](https://github.com/motdotla/node-lambda/pull/530)
+    - [README] Add the 'apiGateway' option to the run command [#532](https://github.com/motdotla/node-lambda/pull/532)
+- Add Node.js 14 to CI settings [#524](https://github.com/motdotla/node-lambda/pull/524)
+- Drop old Node support  [#523](https://github.com/motdotla/node-lambda/pull/523)
+- Bump acorn from 7.0.0 to 7.1.1 [#522](https://github.com/motdotla/node-lambda/pull/522)
+- Add Silent or quiet mode when deploying [#520](https://github.com/motdotla/node-lambda/pull/520)
+    - [README update] Add silent option to deploy command [#521](https://github.com/motdotla/node-lambda/pull/521)
+- Update README (remove --endpoint of run subcommand, add --endpoint of deploy subcommand) [#514](https://github.com/motdotla/node-lambda/pull/514)
+
+### Bugfixes
+- Upgrade "aws-xray-sdk-core" [#529](https://github.com/motdotla/node-lambda/pull/529)
+- Fix Lambda update failure [#526](https://github.com/motdotla/node-lambda/pull/526)
+    - Fix typo [#527](https://github.com/motdotla/node-lambda/pull/527)

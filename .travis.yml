@@ -1,9 +1,19 @@
 language: node_js
 
 node_js:
+<<<<<<< HEAD
   - 8
   - 9
   - 10
+||||||| 7dcd4e8
+  - 6
+  - 8
+  - 9
+  - 10
+=======
+  - "lts/*"
+  - "node"
+>>>>>>> 27fa0d715c5a61ee05d40ec9d0b545bc6f7f0326
 
 cache:
   directories:
