@@ -5,7 +5,7 @@ const os = require('os')
 const fs = require('fs-extra')
 const lambda = require(path.join(__dirname, '..', 'lib', 'main'))
 const Zip = require('node-zip')
-const {assert} = require('chai')
+const { assert } = require('chai')
 const awsMock = require('aws-sdk-mock')
 awsMock.setSDK(path.resolve('node_modules/aws-sdk'))
 
@@ -20,9 +20,10 @@ const originalProgram = {
   memorySize: 128,
   timeout: 3,
   description: '',
-  runtime: 'nodejs8.10',
+  runtime: 'nodejs12.x',
   deadLetterConfigTargetArn: '',
   tracingConfig: '',
+  Layers: '',
   retentionInDays: 30,
   region: 'us-east-1,us-west-2,eu-west-1',
   eventFile: 'event.json',
@@ -82,8 +83,14 @@ const lambdaMockSettings = {
   deleteEventSourceMapping: {
     EventSourceArn: 'Lambda.deleteEventSourceMapping.mock.EventSourceArn',
     FunctionName: 'Lambda.deleteEventSourceMapping.mock.EventSourceArn'
-  }
+  },
+  listTags: {
+    Tags: { tag1: 'key1' }
+  },
+  untagResource: {},
+  tagResource: {}
 }
+
 const _mockSetting = () => {
   awsMock.mock('CloudWatchEvents', 'putRule', (params, callback) => {
     callback(null, {})
@@ -101,7 +108,7 @@ const _mockSetting = () => {
     callback(null, {})
   })
   awsMock.mock('S3', 'putObject', (params, callback) => {
-    callback(null, {'test': 'putObject'})
+    callback(null, { test: 'putObject' })
   })
 
   Object.keys(lambdaMockSettings).forEach((method) => {
@@ -118,18 +125,6 @@ const _awsRestore = () => {
   awsMock.restore('CloudWatchLogs')
   awsMock.restore('S3')
   awsMock.restore('Lambda')
-}
-
-const disableLog = () => {
-  ['log', 'warn', 'info'].forEach((f) => {
-    console[f] = () => {}
-  })
-}
-
-const enableLog = () => {
-  ['log', 'warn', 'info'].forEach((f) => {
-    if (String(console[f]) === '() => {}') delete console[f]
-  })
 }
 
 /* global before, after, beforeEach, afterEach, describe, it */
@@ -153,7 +148,13 @@ describe('lib/main', function () {
   })
 
   it('version should be set', () => {
+<<<<<<< HEAD
     assert.equal(lambda.version, '0.11.7t')
+||||||| 7dcd4e8
+    assert.equal(lambda.version, '0.11.7')
+=======
+    assert.equal(lambda.version, '0.17.0')
+>>>>>>> 27fa0d715c5a61ee05d40ec9d0b545bc6f7f0326
   })
 
   describe('_codeDirectory', () => {
@@ -194,18 +195,36 @@ describe('lib/main', function () {
 
   describe('_isUseS3', () => {
     it('=== true', () => {
+<<<<<<< HEAD
       assert.isTrue(lambda._isUseS3({
         deployS3Bucket: 'bucket',
         deployS3Key: 'key'
       }))
+||||||| 7dcd4e8
+      assert.isTrue(lambda._isUseS3({deployUseS3: true}))
+      assert.isTrue(lambda._isUseS3({deployUseS3: 'true'}))
+=======
+      assert.isTrue(lambda._isUseS3({ deployUseS3: true }))
+      assert.isTrue(lambda._isUseS3({ deployUseS3: 'true' }))
+>>>>>>> 27fa0d715c5a61ee05d40ec9d0b545bc6f7f0326
     })
 
     it('=== false', () => {
       [
         {},
+<<<<<<< HEAD
         {deployS3Bucket: '', deployS3Key: ''},
         {deployS3Bucket: 'bucket'},
         {deployS3Key: 'key'}
+||||||| 7dcd4e8
+        {deployUseS3: false},
+        {deployUseS3: 'false'},
+        {deployUseS3: 'foo'}
+=======
+        { deployUseS3: false },
+        { deployUseS3: 'false' },
+        { deployUseS3: 'foo' }
+>>>>>>> 27fa0d715c5a61ee05d40ec9d0b545bc6f7f0326
       ].forEach((params) => {
         assert.isFalse(lambda._isUseS3(params), params)
       })
@@ -300,6 +319,18 @@ describe('lib/main', function () {
       assert.isNull(params.TracingConfig.Mode)
     })
 
+    it('appends Layers to params when params set', () => {
+      program.layers = 'Layer1,Layer2'
+      const params = lambda._params(program)
+      assert.deepEqual(params.Layers, ['Layer1', 'Layer2'])
+    })
+
+    it('does not append Layers when params are not set', () => {
+      program.layers = ''
+      const params = lambda._params(program)
+      assert.deepEqual(params.Layers, [])
+    })
+
     describe('S3 deploy', () => {
       it('Do not use S3 deploy', () => {
         const params = lambda._params(program, 'Buffer')
@@ -310,10 +341,16 @@ describe('lib/main', function () {
       })
 
       it('Use S3 deploy', () => {
+<<<<<<< HEAD
         const params = lambda._params(Object.assign({
           deployS3Bucket: 'S3Bucket-value',
           deployS3Key: 'S3Key-value'
         }, program), 'Buffer')
+||||||| 7dcd4e8
+        const params = lambda._params(Object.assign({deployUseS3: true}, program), 'Buffer')
+=======
+        const params = lambda._params(Object.assign({ deployUseS3: true }, program), 'Buffer')
+>>>>>>> 27fa0d715c5a61ee05d40ec9d0b545bc6f7f0326
         assert.deepEqual(
           params.Code,
           {
@@ -368,8 +405,8 @@ describe('lib/main', function () {
       it('adds variables when configFile param is set', () => {
         program.configFile = 'tmp.env'
         const params = lambda._params(program)
-        assert.equal(params.Environment.Variables['FOO'], 'bar')
-        assert.equal(params.Environment.Variables['BAZ'], 'bing')
+        assert.equal(params.Environment.Variables.FOO, 'bar')
+        assert.equal(params.Environment.Variables.BAZ, 'bing')
       })
 
       it('when configFile param is set but it is an empty file', () => {
@@ -412,9 +449,9 @@ describe('lib/main', function () {
       fs.mkdirSync('build')
       fs.mkdirsSync(path.join('__unittest', 'hoge'))
       fs.mkdirsSync(path.join('__unittest', 'fuga'))
-      fs.writeFileSync(path.join('__unittest', 'hoge', 'piyo'))
-      fs.writeFileSync(path.join('__unittest', 'hoge', 'package.json'))
-      fs.writeFileSync('fuga')
+      fs.writeFileSync(path.join('__unittest', 'hoge', 'piyo'), '')
+      fs.writeFileSync(path.join('__unittest', 'hoge', 'package.json'), '')
+      fs.writeFileSync('fuga', '')
     })
     after(() => {
       ['build', 'fuga', '__unittest'].forEach((path) => {
@@ -489,14 +526,21 @@ describe('lib/main', function () {
           assert.include(contents, 'package.json')
         })
       })
+      it('_fileCopy should not exclude package-lock.json, even when excluded by excludeGlobs', () => {
+        program.excludeGlobs = '*.json'
+        return lambda._fileCopy(program, '.', codeDirectory, true).then(() => {
+          const contents = fs.readdirSync(codeDirectory)
+          assert.include(contents, 'package-lock.json')
+        })
+      })
 
       it('_fileCopy should not include package.json when --prebuiltDirectory is set', () => {
         const buildDir = '.build_' + Date.now()
         after(() => fs.removeSync(buildDir))
 
         fs.mkdirSync(buildDir)
-        fs.writeFileSync(path.join(buildDir, 'testa'))
-        fs.writeFileSync(path.join(buildDir, 'package.json'))
+        fs.writeFileSync(path.join(buildDir, 'testa'), '')
+        fs.writeFileSync(path.join(buildDir, 'package.json'), '')
 
         program.excludeGlobs = '*.json'
         program.prebuiltDirectory = buildDir
@@ -509,19 +553,73 @@ describe('lib/main', function () {
     })
   })
 
+  describe('_shouldUseNpmCi', () => {
+    beforeEach(() => {
+      return lambda._cleanDirectory(codeDirectory)
+    })
+
+    describe('when package-lock.json exists', () => {
+      beforeEach(() => {
+        fs.writeFileSync(path.join(codeDirectory, 'package-lock.json'), JSON.stringify({}))
+      })
+
+      it('returns true', () => {
+        assert.isTrue(lambda._shouldUseNpmCi(codeDirectory))
+      })
+    })
+
+    describe('when package-lock.json does not exist', () => {
+      beforeEach(() => {
+        fs.removeSync(path.join(codeDirectory, 'package-lock.json'))
+      })
+
+      it('returns false', () => {
+        assert.isFalse(lambda._shouldUseNpmCi(codeDirectory))
+      })
+    })
+  })
+
   describe('_npmInstall', () => {
+    // npm treats files as packages when installing, and so removes them.
+    // Test with `devDependencies` packages that are not installed with the `--production` option.
+    const nodeModulesMocha = path.join(codeDirectory, 'node_modules', 'mocha')
+
     beforeEach(() => {
       return lambda._cleanDirectory(codeDirectory).then(() => {
+        fs.ensureDirSync(nodeModulesMocha)
         return lambda._fileCopy(program, '.', codeDirectory, true)
       })
     })
 
-    it('_npm adds node_modules', function () {
-      _timeout({ this: this, sec: 30 }) // give it time to build the node modules
+    describe('when package-lock.json does exist', () => {
+      it('should use "npm ci"', function () {
+        _timeout({ this: this, sec: 30 }) // ci should be faster than install
 
-      return lambda._npmInstall(program, codeDirectory).then(() => {
-        const contents = fs.readdirSync(codeDirectory)
-        assert.include(contents, 'node_modules')
+        return lambda._npmInstall(program, codeDirectory).then(() => {
+          const contents = fs.readdirSync(codeDirectory)
+          assert.include(contents, 'node_modules')
+
+          // Not installed with the `--production` option.
+          assert.isFalse(fs.existsSync(nodeModulesMocha))
+        })
+      })
+    })
+
+    describe('when package-lock.json does not exist', () => {
+      beforeEach(() => {
+        return fs.removeSync(path.join(codeDirectory, 'package-lock.json'))
+      })
+
+      it('should use "npm install"', function () {
+        _timeout({ this: this, sec: 60 }) // install should be slower than ci
+
+        return lambda._npmInstall(program, codeDirectory).then(() => {
+          const contents = fs.readdirSync(codeDirectory)
+          assert.include(contents, 'node_modules')
+
+          // It remains because it is not erased before installation.
+          assert.isTrue(fs.existsSync(nodeModulesMocha))
+        })
       })
     })
   })
@@ -564,7 +662,7 @@ describe('lib/main', function () {
      * Capture console output
      */
     const captureStream = function (stream) {
-      let oldWrite = stream.write
+      const oldWrite = stream.write
       let buf = ''
       stream.write = function (chunk, encoding, callback) {
         buf += chunk.toString() // chunk is a String or Buffer
@@ -589,18 +687,14 @@ describe('lib/main', function () {
     })
 
     it('should not throw any errors if no script', () => {
-      disableLog()
       return lambda._postInstallScript(program, codeDirectory).then((dummy) => {
-        enableLog()
         assert.isUndefined(dummy)
       })
     })
 
     it('should throw any errors if script fails', () => {
       fs.writeFileSync(postInstallScriptPath, '___fails___')
-      disableLog()
       return lambda._postInstallScript(program, codeDirectory).catch((err) => {
-        enableLog()
         assert.instanceOf(err, Error)
         assert.match(err.message, /^Error: Command failed:/)
       })
@@ -646,9 +740,7 @@ describe('lib/main', function () {
     it('Compress the file. `index.js` and `bin/node-lambda` are included and the permission is also preserved.', function () {
       _timeout({ this: this, sec: 30 }) // give it time to zip
 
-      disableLog()
       return lambda._zip(program, codeDirectory).then((data) => {
-        enableLog()
         const archive = new Zip(data)
         assert.include(archive.files['index.js'].name, 'index.js')
         assert.include(archive.files['bin/node-lambda'].name, 'bin/node-lambda')
@@ -667,11 +759,9 @@ describe('lib/main', function () {
 
           // isSymbolicLink
           assert.include(archive.files['node-lambda-link'].name, 'node-lambda-link')
-
-          const fsConstants = process.binding('constants').fs
           assert.equal(
-            archive.files['node-lambda-link'].unixPermissions & fsConstants.S_IFMT,
-            fsConstants.S_IFLNK
+            archive.files['node-lambda-link'].unixPermissions & fs.constants.S_IFMT,
+            fs.constants.S_IFLNK
           )
         }
       })
@@ -683,9 +773,7 @@ describe('lib/main', function () {
     it('installs and zips with an index.js file and node_modules/aws-sdk (It is also a test of `_buildAndArchive`)', function () {
       _timeout({ this: this, sec: 30 }) // give it time to zip
 
-      disableLog()
       return lambda._archive(program).then((data) => {
-        enableLog()
         const archive = new Zip(data)
         const contents = Object.keys(archive.files).map((k) => {
           return archive.files[k].name.toString()
@@ -697,7 +785,7 @@ describe('lib/main', function () {
 
     it('packages a prebuilt module without installing (It is also a test of `_archivePrebuilt`)', function () {
       _timeout({ this: this, sec: 30 }) // give it time to zip
-      let buildDir = '.build_' + Date.now()
+      const buildDir = '.build_' + Date.now()
       after(() => fs.removeSync(buildDir))
 
       fs.mkdirSync(buildDir)
@@ -708,9 +796,7 @@ describe('lib/main', function () {
       fs.writeFileSync(path.join(buildDir, 'd', 'testb'), '...')
 
       program.prebuiltDirectory = buildDir
-      disableLog()
       return lambda._archive(program).then((data) => {
-        enableLog()
         const archive = new Zip(data)
         const contents = Object.keys(archive.files).map((k) => {
           return archive.files[k].name.toString()
@@ -732,9 +818,7 @@ describe('lib/main', function () {
     before(function () {
       _timeout({ this: this, sec: 30 }) // give it time to zip
 
-      disableLog()
       return lambda._zip(program, codeDirectory).then((data) => {
-        enableLog()
         bufferExpected = data
         fs.writeFileSync(testZipFile, data)
       })
@@ -774,9 +858,7 @@ describe('lib/main', function () {
         const filePath = path.join(path.resolve('/aaaa'), 'bbbb')
         const _program = Object.assign({ deployZipfile: filePath }, program)
         _timeout({ this: this, sec: 30 }) // give it time to zip
-        disableLog()
         return lambda._archive(_program).then((data) => {
-          enableLog()
           // same test as "installs and zips with an index.js file and node_modules/aws-sdk"
           const archive = new Zip(data)
           const contents = Object.keys(archive.files).map((k) => {
@@ -830,9 +912,7 @@ describe('lib/main', function () {
     })
 
     it('should create sample files', () => {
-      disableLog()
       lambda.setup(program)
-      enableLog()
 
       const libPath = path.join(__dirname, '..', 'lib')
       targetFiles.forEach((targetFile) => {
@@ -991,6 +1071,33 @@ describe('lib/main', function () {
           lambdaMockSettings.listEventSourceMappings.EventSourceMappings
         )
       })
+    })
+  })
+
+  describe('_getStartingPosition', () => {
+    it('null in SQS', () => {
+      assert.isNull(lambda._getStartingPosition({
+        EventSourceArn: 'arn:aws:sqs:us-east-1:sqs-queuename1'
+      }))
+    })
+
+    it('When there is no setting', () => {
+      assert.equal(
+        lambda._getStartingPosition({
+          EventSourceArn: 'arn:aws:kinesis:test'
+        }),
+        'LATEST'
+      )
+    })
+
+    it('With StartingPosition', () => {
+      assert.equal(
+        lambda._getStartingPosition({
+          EventSourceArn: 'arn:aws:kinesis:test',
+          StartingPosition: 'test position'
+        }),
+        'test position'
+      )
     })
   })
 
@@ -1226,9 +1333,7 @@ describe('lib/main', function () {
       program.eventFile = 'newEvent.json'
       program.contextFile = 'newContext.json'
 
-      disableLog()
       lambda.setup(program)
-      enableLog()
 
       assert.equal(fs.readFileSync('newContext.json').toString(), '{"FOO"="bar"\n"BAZ"="bing"\n}')
       assert.equal(fs.readFileSync('newEvent.json').toString(), '{"FOO"="bar"}')
@@ -1263,13 +1368,11 @@ describe('lib/main', function () {
   describe('Lambda.prototype._deployToRegion()', () => {
     it('simple test with mock', () => {
       const params = lambda._params(program, null)
-      disableLog()
       return lambda._deployToRegion(program, params, 'us-east-1').then((result) => {
-        enableLog()
         assert.deepEqual(
           result,
           [
-            [[], []],
+            [[], [], []],
             [],
             { retentionInDays: 30 }
           ]
@@ -1281,10 +1384,21 @@ describe('lib/main', function () {
   describe('Lambda.prototype.deploy()', () => {
     it('simple test with mock', function () {
       _timeout({ this: this, sec: 30 }) // give it time to zip
-      disableLog()
       return lambda.deploy(program).then((result) => {
-        enableLog()
         assert.isUndefined(result)
+      })
+    })
+  })
+
+  describe('Lambda.prototype._updateTags()', () => {
+    it('simple test with mock', () => {
+      return lambda._updateTags(
+        awsLambda,
+        'arn:aws:lambda:eu-central-1:1234567:function:test',
+        { tagKey: 'tagValue' }).then((result) => {
+        assert.deepEqual(
+          result, {}
+        )
       })
     })
   })
