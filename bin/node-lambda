@@ -2,8 +2,10 @@
 
 'use strict'
 
-require('dotenv').config()
 const path = require('path')
+const dotenv = require('dotenv')
+
+dotenv.load()
 
 const lambda = require(path.join(__dirname, '..', 'lib', 'main.js'))
 const program = require('commander')
@@ -29,13 +31,12 @@ const AWS_MEMORY_SIZE = process.env.AWS_MEMORY_SIZE || 128
 const AWS_TIMEOUT = process.env.AWS_TIMEOUT || 60
 const AWS_RUN_TIMEOUT = process.env.AWS_RUN_TIMEOUT || 3
 const AWS_DESCRIPTION = process.env.AWS_DESCRIPTION || packageJson.description || ''
-const AWS_RUNTIME = process.env.AWS_RUNTIME || 'nodejs12.x'
+const AWS_RUNTIME = process.env.AWS_RUNTIME || 'nodejs8.10'
 const AWS_PUBLISH = process.env.AWS_PUBLISH || false
 const AWS_FUNCTION_VERSION = process.env.AWS_FUNCTION_VERSION || ''
 const AWS_VPC_SUBNETS = process.env.AWS_VPC_SUBNETS || ''
 const AWS_VPC_SECURITY_GROUPS = process.env.AWS_VPC_SECURITY_GROUPS || ''
 const AWS_TRACING_CONFIG = process.env.AWS_TRACING_CONFIG || ''
-const AWS_LAYERS = process.env.AWS_LAYERS || ''
 const AWS_LOGS_RETENTION_IN_DAYS = process.env.AWS_LOGS_RETENTION_IN_DAYS || ''
 const EVENT_FILE = process.env.EVENT_FILE || 'event.json'
 const PACKAGE_DIRECTORY = process.env.PACKAGE_DIRECTORY
@@ -58,9 +59,6 @@ const AWS_DLQ_TARGET_ARN = (() => {
 })()
 const PROXY = process.env.PROXY || process.env.http_proxy || ''
 const ENABLE_RUN_MULTIPLE_EVENTS = true
-const KEEP_NODE_MODULES = process.env.KEEP_NODE_MODULES || false
-const DOCKER_VOLUMES = process.env.DOCKER_VOLUMES || ''
-const AWS_TAGS = process.env.AWS_TAGS || ''
 
 program
   .command('deploy')
@@ -91,11 +89,11 @@ program
     AWS_DLQ_TARGET_ARN)
   .option('-c, --tracingConfig [AWS_TRACING_CONFIG]', 'Lambda tracing settings',
     AWS_TRACING_CONFIG)
-  .option('-l, --layers [AWS_LAYERS]', 'Lambda Layers settings (e.g. "ARN1,ARN2[,..])"', AWS_LAYERS)
   .option('-R, --retentionInDays [AWS_LOGS_RETENTION_IN_DAYS]', 'CloudWatchLogs retentionInDays settings',
     AWS_LOGS_RETENTION_IN_DAYS)
+  .option('-A, --packageDirectory [PACKAGE_DIRECTORY]', 'Local Package Directory', PACKAGE_DIRECTORY)
   .option('-G, --sourceDirectory [SRC_DIRECTORY]', 'Path to lambda source Directory (e.g. "./some-lambda")', SRC_DIRECTORY)
-  .option('-I, --dockerImage [DOCKER_IMAGE]', 'Docker image for npm ci', DOCKER_IMAGE)
+  .option('-I, --dockerImage [DOCKER_IMAGE]', 'Docker image for npm install', DOCKER_IMAGE)
   .option('-f, --configFile [CONFIG_FILE]',
     'Path to file holding secret environment variables (e.g. "deploy.env")', CONFIG_FILE)
   .option('-S, --eventSourceFile [EVENT_SOURCE_FILE]',
@@ -110,21 +108,14 @@ program
   .option('-O, --deployS3Key [DEPLOY_S3_KEY]',
     'Use S3 to deploy. Specify it with `--deployS3Bucket`.', DEPLOY_S3_KEY)
   .option('-y, --proxy [PROXY]', 'Proxy server', PROXY)
-  .option('-A, --tags [AWS_TAGS]', 'Tags as key value pairs (e.g. "tagname1=tagvalue1,tagname2=tagvalue2)"', AWS_TAGS)
-  .option('--silent', 'Silent  or  quiet mode', false)
-  .action((prg) => {
-    if (prg.silent) {
-      console.log = () => {}
-    }
-    lambda.deploy(prg)
-  })
+  .action((prg) => lambda.deploy(prg))
 
 program
   .command('package')
   .alias('zip')
   .description('Create zipped package for Amazon Lambda deployment')
   .option('-A, --packageDirectory [PACKAGE_DIRECTORY]', 'Local Package Directory', PACKAGE_DIRECTORY)
-  .option('-I, --dockerImage [DOCKER_IMAGE]', 'Docker image for npm ci', DOCKER_IMAGE)
+  .option('-I, --dockerImage [DOCKER_IMAGE]', 'Docker image for npm install', DOCKER_IMAGE)
   .option('-n, --functionName [AWS_FUNCTION_NAME]', 'Lambda FunctionName', AWS_FUNCTION_NAME)
   .option('-H, --handler [AWS_HANDLER]', 'Lambda Handler {index.handler}', AWS_HANDLER)
   .option('-e, --environment [AWS_ENVIRONMENT]', 'Choose environment {dev, staging, production}',
@@ -132,8 +123,6 @@ program
   .option('-x, --excludeGlobs [EXCLUDE_GLOBS]',
     'Space-separated glob pattern(s) for additional exclude files (e.g. "event.json dotenv.sample")', EXCLUDE_GLOBS)
   .option('-D, --prebuiltDirectory [PREBUILT_DIRECTORY]', 'Prebuilt directory', PREBUILT_DIRECTORY)
-  .option('-m, --keepNodeModules [KEEP_NODE_MODULES]', 'Keep the current node_modules directory.', KEEP_NODE_MODULES)
-  .option('-v, --dockerVolumes [DOCKER_VOLUMES]', 'Additional docker volumes to mount. Each volume definition has to be separated by a space (e.g. "$HOME/.gitconfig:/etc/gitconfig $HOME/.ssh:/root/.ssh")', DOCKER_VOLUMES)
   .action((prg) => lambda.package(prg))
 
 program
@@ -150,7 +139,6 @@ program
   .option('-M, --enableRunMultipleEvents [ENABLE_RUN_MULTIPLE_EVENTS]', 'Enable run multiple events',
     ENABLE_RUN_MULTIPLE_EVENTS)
   .option('-y, --proxy [PROXY]', 'Proxy server', PROXY)
-  .option('--apiGateway', 'Convert to API Gateway events', false)
   .action((prg) => lambda.run(prg))
 
 program
@@ -159,12 +147,6 @@ program
   .option('-j, --eventFile [EVENT_FILE]', 'Event JSON File', EVENT_FILE)
   .option('-x, --contextFile [CONTEXT_FILE]', 'Context JSON File', CONTEXT_FILE)
   .action((prg) => lambda.setup(prg))
-
-program.on('command:*', (cmd) => {
-  console.log(`Unknown command ${cmd}`)
-  console.log()
-  program.help()
-})
 
 program
   .version(lambda.version)
