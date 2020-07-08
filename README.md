@@ -4,7 +4,6 @@
 
 Command line tool to locally run and deploy your node.js application to [Amazon Lambda](http://aws.amazon.com/lambda/).
 
-![Node CI](https://github.com/motdotla/node-lambda/workflows/Node%20CI/badge.svg)
 [![BuildStatus](https://travis-ci.org/motdotla/node-lambda.svg?branch=master)](https://travis-ci.org/motdotla/node-lambda)
 [![NPM version](https://badge.fury.io/js/node-lambda.svg)](http://badge.fury.io/js/node-lambda)
 
@@ -20,9 +19,7 @@ $ npm install -g node-lambda
 
 ## Example App
 
-Example apps make it easy to get up and running
-* [JavaScript example](https://github.com/motdotla/node-lambda-template).
-* [TypeScript example](https://github.com/fogfish/node-lambda-typescript-template).
+The [node-lambda-template](https://github.com/RebelMail/node-lambda-template) example app makes it easy to get up and running.
 
 ## Usage
 
@@ -81,13 +78,12 @@ AWS_MEMORY_SIZE            // (default: 128)
 AWS_TIMEOUT                // (default: 60)
 AWS_RUN_TIMEOUT            // (default: 3)
 AWS_DESCRIPTION            // (default: package.json.description or '')
-AWS_RUNTIME                // (default: 'nodejs12.x')
+AWS_RUNTIME                // (default: 'nodejs8.10')
 AWS_PUBLISH                // (default: false)
 AWS_FUNCTION_VERSION       // (default: '')
 AWS_VPC_SUBNETS            // (default: '')
 AWS_VPC_SECURITY_GROUPS    // (default: '')
 AWS_TRACING_CONFIG         // (default: '')
-AWS_LAYERS                 // (default: '')
 AWS_LOGS_RETENTION_IN_DAYS // (default: '')
 EVENT_FILE                 // (default: 'event.json')
 PACKAGE_DIRECTORY          // (default: not set)
@@ -100,7 +96,6 @@ DEPLOY_ZIPFILE             // (default: '')
 DEPLOY_S3_BUCKET           // (default: '')
 DEPLOY_S3_KEY              // (default: '')
 AWS_DLQ_TARGET_ARN         // (default: not set)
-AWS_TAGS                   // (default: '')
 ```
 
 #### run
@@ -119,13 +114,13 @@ Options:
   -h, --help                            output usage information
   -H, --handler [index.handler]         Lambda Handler {index.handler}
   -j, --eventFile [event.json]          Event JSON File
-  -u, --runtime [nodejs12.x]            Lambda Runtime
+  -u, --runtime [nodejs8.10]            Lambda Runtime
   -t, --timeout [3]                     Lambda Timeout
   -f, --configFile []                   Path to file holding secret environment variables (e.g. "deploy.env")
   -x, --contextFile [context.json]      Context JSON File
   -M, --enableRunMultipleEvents [true]  Enable run multiple events
   -y, --proxy []                        Proxy server
-  --apiGateway                          Convert to API Gateway events
+  -E, --endpoint []                     Use different endpoint (e.g. localstack, "http://127.0.0.1:4574")
 ```
 
 #### package
@@ -149,8 +144,6 @@ Options:
   -e, --environment [development]   Choose environment {dev, staging, production}
   -x, --excludeGlobs [event.json]   Space-separated glob pattern(s) for additional exclude files (e.g. "event.json dotenv.sample")
   -D, --prebuiltDirectory []        Prebuilt directory
-  -m, --keepNodeModules [false]     Keep the current node_modules and skip the npm install step
-  -v, --dockerVolumes []            Additional docker volumes to mount. Each volume definition has to be separated by a space (e.g. "$HOME/.gitconfig:/etc/gitconfig $HOME/.ssh:/root/.ssh"
 ```
 
 #### deploy
@@ -168,7 +161,6 @@ Deploy your application to Amazon Lambda
 Options:
   -h, --help                          output usage information
   -e, --environment [development]     Choose environment {dev, staging, production}
-  -E, --endpoint [AWS_ENDPOINT]       Choose endpoint (e.g. localstack, "http://127.0.0.1:4574") (default: "")
   -a, --accessKey [your_key]          AWS Access Key
   -s, --secretKey [your_secret]       AWS Secret Key
   -P, --profile []                    AWS Profile
@@ -180,7 +172,7 @@ Options:
   -m, --memorySize [128]              Lambda Memory Size
   -t, --timeout [3]                   Lambda Timeout
   -d, --description [missing]         Lambda Description
-  -u, --runtime [nodejs12.x]          Lambda Runtime
+  -u, --runtime [nodejs8.10]          Lambda Runtime
   -p, --publish [false]               Lambda Publish
   -L, --lambdaVersion []              Lambda Function Version
   -b, --vpcSubnets []                 Lambda Function VPC Subnets
@@ -188,8 +180,8 @@ Options:
   -K, --kmsKeyArn []                  Lambda KMS Key ARN
   -Q, --deadLetterConfigTargetArn []  Lambda DLQ resource
   -c, --tracingConfig []              Lambda tracing settings
-  -l, --layers []                     Lambda Layers settings (e.g. "ARN1,ARN2[,..])" (default: "")
   -R, --retentionInDays []            CloudWatchLogs retentionInDays settings
+  -A, --packageDirectory [build]      Local Package Directory
   -G, --sourceDirectory []            Path to lambda source Directory (e.g. "./some-lambda")
   -I, --dockerImage []                Docker image for npm install
   -f, --configFile []                 Path to file holding secret environment variables (e.g. "deploy.env")
@@ -201,8 +193,6 @@ Options:
   -B, --deployS3Bucket []             Use S3 to deploy. Specify it with `--deployS3Key`. (default: )
   -O, --deployS3Key []                Use S3 to deploy. Specify it with `--deployS3Bucket`. (default: )
   -y, --proxy []                      Proxy server
-  -A, --tags []                       Tags as key value pairs (e.g. "tagname1=tagvalue1,tagname2=tagvalue2") (default: "")
-  --silent                            Silent  or  quiet mode (default: false)
 ```
 
 If you are deploying to a custom endpoint you may also need to pass in an access key/secret. For localstack these can be anything, but cannot be blank:
@@ -217,7 +207,7 @@ AWS Lambda will let you set environment variables for your function. Use the sam
 
 ## Node.js Runtime Configuration
 
-AWS Lambda now supports Node.js 12 and Node.js 10. Please also check the [Programming Model (Node.js)](http://docs.aws.amazon.com/lambda/latest/dg/programming-model.html) page.
+AWS Lambda now supports Node.js 8.10, 6.10 and Node.js 4.3. Please also check the [Programming Model (Node.js)](http://docs.aws.amazon.com/lambda/latest/dg/programming-model.html) page.
 
 ## Post install script
 When running `node-lambda deploy` if you need to do some action after `npm install --production` and before deploying to AWS Lambda (e.g. replace some modules with precompiled ones or download some libraries, replace some config file depending on environment) you can create `post_install.sh` script. If the file exists the script will be executed (and output shown after execution) if not it is skipped. Environment string is passed to script as first parameter so you can use it if needed. Make sure that the script is executable.
